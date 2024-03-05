@@ -1,6 +1,6 @@
 using Godot;
 
-namespace Strategy;
+namespace Godizmos;
 
 public static class Gizmos
 {
@@ -24,5 +24,16 @@ public static class Gizmos
         }
 
         GizmosNode.Instance.DrawCube(position, size);
+    }
+    
+    public static void DrawSphere(Vector3 position, float radius)
+    {
+        if (GizmosNode.Instance == null)
+        {
+            GD.PushError($"[Godizmos] {nameof(GizmosNode)} instance not found! Did you forget to add a {nameof(GizmosNode)} to the scene?");
+            return;
+        }
+
+        GizmosNode.Instance.DrawSphere(position, radius);
     }
 }
