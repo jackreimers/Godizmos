@@ -1,5 +1,3 @@
-using Godot;
-
 namespace Godizmos;
 
 public static class Gizmos
