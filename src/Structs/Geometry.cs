@@ -1,6 +1,6 @@
 namespace Godizmos;
 
-public struct Geometry
+internal struct Geometry
 {
     public Vector3[] Vertices { get; }
     public int[] Indices { get; }
