@@ -4,40 +4,58 @@ namespace Godizmos;
 
 internal static class MeshHelper
 {   
-    public static void DrawLine(Vector3 from, Vector3 to, Color color)
+    public static Node3D DrawLine(Vector3 from, Vector3 to, Color color)
     {
         var vertices = new[] { from, to };
         var indices = new[] { 0, 1 };
 
         var geometry = new Geometry(vertices, indices);
-        BuildMesh(geometry, color);
+        var gizmo = BuildMesh(geometry, color);
+        
+        return gizmo;
     }
     
-    public static void DrawCube(Vector3 position, Vector3 size, Color color)
+    public static Node3D DrawSquare(Vector3 position, Vector2 size, Color color)
     {
-        var geometry = GeometryHelper.GetCubeGeometry(position, size);
+        var geometry = GeometryHelper.GetSquareGeometry(size);
 
-        var meshInstance = BuildMesh(geometry, color);
-        meshInstance.Position = -(Vector3.One * size) * 0.5f;
+        var gizmo = BuildMesh(geometry, color);
+        gizmo.Position = position;
+        
+        return gizmo;
     }
     
-    public static void DrawCircle(Vector3 position, Vector3 axis, float radius, Color color)
+    public static Node3D DrawCube(Vector3 position, Vector3 size, Color color)
     {
-        var geometry = GeometryHelper.GetCircleGeometry(axis, radius, Gizmos.Options.Resolution);
+        var geometry = GeometryHelper.GetCubeGeometry(size);
 
-        var meshInstance = BuildMesh(geometry, color);
-        meshInstance.Position = position;
+        var gizmo = BuildMesh(geometry, color);
+        gizmo.Position = position;
+        
+        return gizmo;
     }
     
-    public static void DrawSphere(Vector3 position, float radius, Color color)
+    public static Node3D DrawCircle(Vector3 position, float radius, Color color)
+    {
+        var geometry = GeometryHelper.GetCircleGeometry(radius, Gizmos.Options.Resolution);
+
+        var gizmo = BuildMesh(geometry, color);
+        gizmo.Position = position;
+        
+        return gizmo;
+    }
+    
+    public static Node3D DrawSphere(Vector3 position, float radius, Color color)
     {
         var geometry = GeometryHelper.GetSphereGeometry(radius, Gizmos.Options.Resolution);
 
-        var meshInstance = BuildMesh(geometry, color);
-        meshInstance.Position = position;
+        var gizmo = BuildMesh(geometry, color);
+        gizmo.Position = position;
+        
+        return gizmo;
     }
 
-    private static MeshInstance3D BuildMesh(Geometry geometry, Color color)
+    private static Node3D BuildMesh(Geometry geometry, Color color)
     {
         var mesh = new ArrayMesh();
         var arrays = new Array();
@@ -59,10 +77,10 @@ internal static class MeshHelper
         var material = new StandardMaterial3D
         {
             ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
-            NoDepthTest = true,
+            NoDepthTest = false,
             VertexColorUseAsAlbedo = true,
             Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
-            CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
         };
         
         var meshInstance = new MeshInstance3D
@@ -74,6 +92,6 @@ internal static class MeshHelper
         node.AddChild(meshInstance);
         Gizmos.Root.AddChild(node);
         
-        return meshInstance;
+        return node;
     }
 }

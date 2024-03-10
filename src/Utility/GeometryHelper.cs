@@ -4,18 +4,46 @@ namespace Godizmos;
 
 internal static class GeometryHelper
 {
-    internal static Geometry GetCubeGeometry(Vector3 position, Vector3 size)
+    public static Geometry GetSquareGeometry(Vector2 size)
+    {
+        var vertices = new Vector2[]
+        {
+            new(-0.5f, -0.5f),
+            new(0.5f, -0.5f),
+            new(0.5f, 0.5f),
+            new(-0.5f, 0.5f),
+        };
+
+        var indices = new[]
+        {
+            0, 1,
+            1, 2,
+            2, 3,
+            3, 0
+        };
+
+        for (var i = 0; i < vertices.Length; i++)
+        {
+            vertices[i] *= size;
+        }
+
+        return new Geometry(
+            vertices.Select(s => new Vector3(s.X, 0f, s.Y)).ToArray(), 
+            indices);
+    }
+
+    public static Geometry GetCubeGeometry(Vector3 size)
     {
         var vertices = new Vector3[]
         {
-            new(0, 0, 0),
-            new(1, 0, 0),
-            new(1, 0, 1),
-            new(0, 0, 1),
-            new(0, 1, 0),
-            new(1, 1, 0),
-            new(1, 1, 1),
-            new(0, 1, 1)
+            new(-0.5f, -0.5f, -0.5f),
+            new(0.5f, -0.5f, -0.5f),
+            new(0.5f, -0.5f, 0.5f),
+            new(-0.5f, -0.5f, 0.5f),
+            new(-0.5f, 0.5f, -0.5f),
+            new(0.5f, 0.5f, -0.5f),
+            new(0.5f, 0.5f, 0.5f),
+            new(-0.5f, 0.5f, 0.5f)
         };
 
         //Denotes vertices that are connected to form lines
@@ -35,17 +63,33 @@ internal static class GeometryHelper
             3, 7
         };
 
-        //Offset and scale the shape based on the position and size
         for (var i = 0; i < vertices.Length; i++)
         {
-            vertices[i] = vertices[i] * size + position;
+            vertices[i] *= size;
         }
 
-        return new Geometry(vertices, indices);
+        return new Geometry(vertices.ToArray(), indices.ToArray());
     }
 
-    internal static Geometry GetCircleGeometry(Vector3 rotation, float radius, int resolution)
+    public static Geometry GetCircleGeometry(float radius, int resolution)
     {
+        return GetCircleGeometry(radius, resolution, Vector3.Zero);
+    }
+
+    private static Geometry GetCircleGeometry(float radius, int resolution, Vector3 rotation)
+    {
+        if (resolution < 6)
+        {
+            resolution = 6;
+        }
+
+        //Ensure resolution is a multiple of 6 to prevent gaps in the geometry
+        var remainder = resolution % 6;
+        if (remainder != 0)
+        {
+            resolution -= remainder;
+        }
+
         var vertices = new List<Vector3>();
         var indices = new List<int>();
 
@@ -62,7 +106,7 @@ internal static class GeometryHelper
             vertices.Add(new Vector3(sin, 0f, cos) * radius);
 
             var nextIndex = i + 1 == resolution
-                ? i + 1 - resolution
+                ? 0
                 : i + 1;
 
             indices.Add(i);
@@ -84,14 +128,14 @@ internal static class GeometryHelper
         return new Geometry(vertices.ToArray(), indices.ToArray());
     }
 
-    internal static Geometry GetSphereGeometry(float radius, int resolution)
+    public static Geometry GetSphereGeometry(float radius, int resolution)
     {
         var vertices = new List<Vector3>();
         var indices = new List<int>();
 
-        var circle1 = GetCircleGeometry(Vector3.Zero, radius, resolution);
-        var circle2 = GetCircleGeometry(new Vector3(90f, 45f, 0f), radius, resolution);
-        var circle3 = GetCircleGeometry(new Vector3(90f, 135f, 0f), radius, resolution);
+        var circle1 = GetCircleGeometry(radius, resolution);
+        var circle2 = GetCircleGeometry(radius, resolution, new Vector3(90f, 45f, 0f));
+        var circle3 = GetCircleGeometry(radius, resolution, new Vector3(90f, 135f, 0f));
 
         vertices.AddRange(circle1.Vertices);
         vertices.AddRange(circle2.Vertices);
